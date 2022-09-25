@@ -213,22 +213,14 @@
                                                  chan)
                     out (some-> (get reply "out")
                                 bytes->string)
-                    pod-print (some-> (get reply "print")
-                                      bytes->string)
-                    pod-flush (contains? reply "flush")
                     err (some-> (get reply "err")
                                 bytes->string)]
                 ;; NOTE: write to out and err before delivering promise for making
                 ;; listening to output synchronous.
-                (when pod-print
-                  (binding [*out* out-stream]
-                    (print pod-print)))
-                (when pod-flush
-                  (binding [*out* out-stream]
-                    (. out-stream (flush))))
                 (when out
                   (binding [*out* out-stream]
-                    (println out)))
+                    (print out)
+                    (. out-stream (flush))))
                 (when err (binding [*out* err-stream]
                             (println err)))
                 (when (or value* error? namespace)
